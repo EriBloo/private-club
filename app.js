@@ -17,6 +17,14 @@ const indexRouter = require('./routes/index');
 
 const app = express();
 
+const mongoose = require('mongoose');
+mongoose.connect(process.env.DB_STRING, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -36,25 +44,30 @@ app.use(
 );
 
 passport.use(
-  new LocalStrategy((name, password, done) => {
-    User.findOne({ name }, (err, user) => {
-      if (err) {
-        return done(err);
-      }
-      if (!user) {
-        return done(null, false, { msg: 'Incorrect username' });
-      }
-      bcrypt.compare(password, user.password, (err, res) => {
+  new LocalStrategy(
+    {
+      usernameField: 'name',
+    },
+    (name, password, done) => {
+      User.findOne({ name }, (err, user) => {
         if (err) {
           return done(err);
         }
-        if (res) {
-          return done(null, user);
+        if (!user) {
+          return done(null, false, { msg: 'Incorrect username' });
         }
-        return done(null, false, { msg: 'Incorrect password' });
+        bcrypt.compare(password, user.password, (err, res) => {
+          if (err) {
+            return done(err);
+          }
+          if (res) {
+            return done(null, user);
+          }
+          return done(null, false, { msg: 'Incorrect password' });
+        });
       });
-    });
-  }),
+    },
+  ),
 );
 
 passport.serializeUser(function (user, done) {
@@ -87,7 +100,7 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.render('error', { title: 'Not found', user: req.user });
 });
 
 module.exports = app;
