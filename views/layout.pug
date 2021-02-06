@@ -1,7 +1,35 @@
 doctype html
 html
   head
+    meta(charset='utf-8')
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    link(href='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1' crossorigin='anonymous')
+    script(src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js' integrity='sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW' crossorigin='anonymous')
+    script(src='https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js' integrity='sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D' crossorigin='anonymous')
+    link(rel='stylesheet' href='/stylesheets/style.css')
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    block content
+    nav(class='navbar navbar-light bg-light fixed-top')
+      div(class='container')
+        a(class='navbar-brand mb-0 h1' href='/') Private Club
+        div(class='row')
+          if user
+            if user.rank === 0
+              a(class='text-decoration-none h6 text-primary col text-nowrap mb-0' href='/member' ) Become a member
+            a(class='text-decoration-none h6 text-secondary col text-nowrap mb-0' href='/log-out' ) Log out
+          else
+            a(class='text-decoration-none h6 text-secondary col text-nowrap mb-0' href='/sign-up' ) Sign up
+            a(class='text-decoration-none h6 text-primary col text-nowrap mb-0' href='/log-in') Log in
+
+    if user
+      div(class='container mt-2')
+        div(class='row justify-content-center')
+          form(class='col-md-6 row' method='POST' action='/')
+            div(class='col-10')
+              input(class='form-control' type='text' name='comment' placeholder='Write something interesting...' required)
+            button(class='btn btn-sm btn-success col-2' type='submit') Post
+        hr
+
+
+    div(class='container mt-2')
+      block content

@@ -1,5 +1,14 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  div(class='row' data-masonry='{ "percentPosition": true }')
+    if comments
+      for comment in comments
+        div(class='col-sm-6 col-lg-4 mb-4')
+          div(class='card')
+            div(class='card-body')
+              p(class='card-text')= comment.content
+              div(class='card-text d-flex justify-content-between')
+                small Posted #{moment(comment.date).fromNow()}
+                if user && user.rank !== 0
+                  small By #{comment.author}

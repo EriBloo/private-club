@@ -7,7 +7,11 @@ const session = require('express-session');
 const passport = require('passport');
 const bcrypt = require('bcryptjs');
 const LocalStrategy = require('passport-local').Strategy;
+const dotenv = require('dotenv');
+
 const User = require('./models/user');
+
+dotenv.config();
 
 const indexRouter = require('./routes/index');
 
@@ -65,6 +69,8 @@ passport.deserializeUser(function (id, done) {
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.locals.moment = require('moment');
 
 app.use('/', indexRouter);
 
