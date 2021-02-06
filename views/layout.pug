@@ -21,15 +21,5 @@ html
             a(class='text-decoration-none h6 text-secondary col text-nowrap mb-0' href='/sign-up' ) Sign up
             a(class='text-decoration-none h6 text-primary col text-nowrap mb-0' href='/log-in') Log in
 
-    if user
-      div(class='container mt-2')
-        div(class='row justify-content-center')
-          form(class='col-md-6 row' method='POST' action='/')
-            div(class='col-10')
-              input(class='form-control' type='text' name='comment' placeholder='Write something interesting...' required)
-            button(class='btn btn-sm btn-success col-2' type='submit') Post
-        hr
-
-
-    div(class='container mt-2')
+    div(class='container mt-4')
       block content
