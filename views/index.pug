@@ -3,10 +3,11 @@ extends layout
 block content
   if user
     div(class='row justify-content-center')
-      form(class='col-md-6 row' method='POST' action='/')
-        div(class='col-10')
-          input(class='form-control' type='text' name='comment' placeholder='Write something interesting...' required)
-        button(class='btn btn-sm btn-success col-2' type='submit') Post
+      form(class='col-12 col-md-8 col-lg-6 row' method='POST' action='/member')
+        div(class='mb-3')
+          textarea(class='form-control' name='comment' id='comment' placeholder='Write something...' required)
+        div
+          button(class='btn btn-success' type='submit') Post
     hr
 
   div(class='row' data-masonry='{ "percentPosition": true }')
