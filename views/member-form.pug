@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  div(class='row justify-content-center')
+    form(class='col-md-8 col-lg-6 row' method='POST' action='/member')
+      div(class='row mb-3')
+        label(class='col-form-label col-sm-2' for='passcode') Pass: 
+        div(class='col-sm-10')
+          input(class='form-control' type='password' name='passcode' id='passcode' required)
+      if errors
+        ul(class='mb-3')
+          for error in errors
+            li(class='text-danger')= error.msg
+      div
+        button(class='btn btn-success' type='submit') Upgrade

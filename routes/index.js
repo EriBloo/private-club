@@ -84,4 +84,47 @@ router.get('/log-out', (req, res) => {
   res.redirect('/');
 });
 
+router.get('/member', (req, res) =>
+  res.render('member-form', { title: 'Become a member', user: req.user }),
+);
+
+router.post('/member', [
+  body('passcode')
+    .escape()
+    .custom((value) => {
+      if (value === process.env.ADMIN_PASSCODE) {
+        return true;
+      }
+      if (value === process.env.MEMBER_PASSCODE) {
+        return true;
+      }
+      return false;
+    }),
+  (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      res.render('member-form', {
+        title: 'Become a member',
+        user: req.user,
+        errors: errors.errors,
+      });
+      return;
+    }
+
+    User.findByIdAndUpdate(
+      req.user.id,
+      {
+        rank: req.body.passcode === process.env.ADMIN_PASSCODE ? 2 : 1,
+      },
+      function (err) {
+        if (err) {
+          next(err);
+        }
+        res.redirect('/');
+      },
+    );
+  },
+]);
+
 module.exports = router;
