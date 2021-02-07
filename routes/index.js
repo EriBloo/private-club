@@ -123,15 +123,30 @@ router.post('/sign-up', [
   },
 ]);
 
-router.get('/log-in', (req, res) => res.render('log-in-form'));
-
-router.post(
-  '/log-in',
-  passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/log-in',
-  }),
+router.get('/log-in', (req, res) =>
+  res.render('log-in-form', { title: 'Log in' }),
 );
+
+router.post('/log-in', [
+  body('name').escape(),
+  body('password').escape(),
+  function (req, res, next) {
+    passport.authenticate('local', function (err, user, info) {
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        return res.render('log-in-form', { title: 'Log in', errors: info });
+      }
+      req.login(user, function (err) {
+        if (err) {
+          next(err);
+        }
+        res.redirect('/');
+      });
+    })(req, res, next);
+  },
+]);
 router.get('/log-out', (req, res) => {
   req.logout();
   res.redirect('/');
