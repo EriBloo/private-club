@@ -6,6 +6,13 @@ const { body, validationResult } = require('express-validator');
 const User = require('../models/user');
 const Comment = require('../models/comment');
 
+function checkAuthentication(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/log-in');
+}
+
 /* GET home page. */
 router.get('/', function (req, res, next) {
   Comment.find()
@@ -152,7 +159,7 @@ router.get('/log-out', (req, res) => {
   res.redirect('/');
 });
 
-router.get('/member', (req, res) =>
+router.get('/member', checkAuthentication, (req, res) =>
   res.render('member-form', { title: 'Become a member', user: req.user }),
 );
 
