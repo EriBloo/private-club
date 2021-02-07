@@ -4,11 +4,64 @@ const passport = require('passport');
 const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/user');
+const Comment = require('../models/comment');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-  res.render('index', { title: 'Private club', user: req.user });
+  Comment.find()
+    .populate('author')
+    .exec(function (err, results) {
+      if (err) {
+        next(err);
+      }
+      res.render('index', {
+        title: 'Private Club',
+        user: req.user,
+        comments: results,
+      });
+    });
 });
+
+router.post('/', [
+  body('comment')
+    .trim()
+    .escape()
+    .isLength({ min: 5 })
+    .withMessage('Message must be at least of 5 characters'),
+  function (req, res, next) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      Comment.find()
+        .populate('author')
+        .exec(function (err, results) {
+          if (err) {
+            next(err);
+          }
+          res.render('index', {
+            title: 'Private Club',
+            user: req.user,
+            errors: errors.errors,
+            comments: results,
+          });
+        });
+      return;
+    }
+
+    const newComment = new Comment({
+      author: req.user,
+      content: req.body.comment,
+      date: new Date(),
+    });
+
+    newComment.save(function (err) {
+      if (err) {
+        next(err);
+      }
+      res.redirect('/');
+    });
+  },
+]);
 
 router.get('/sign-up', (req, res) =>
   res.render('sign-up-form', { title: 'Create account' }),

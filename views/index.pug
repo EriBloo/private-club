@@ -3,9 +3,13 @@ extends layout
 block content
   if user
     div(class='row justify-content-center')
-      form(class='col-12 col-md-8 col-lg-6 row' method='POST' action='/member')
+      form(class='col-12 col-md-8 col-lg-6 row' method='POST' action='/')
         div(class='mb-3')
           textarea(class='form-control' name='comment' id='comment' placeholder='Write something...' required)
+        if errors
+          ul(class='mb-3')
+            for error in errors
+              li(class='text-danger')= error.msg
         div
           button(class='btn btn-success' type='submit') Post
     hr
@@ -18,6 +22,6 @@ block content
             div(class='card-body')
               p(class='card-text')= comment.content
               div(class='card-text d-flex justify-content-between')
-                small Posted #{moment(comment.date).fromNow()}
+                small(class='text-muted') Posted #{moment(comment.date).fromNow()}
                 if user && user.rank !== 0
-                  small By #{comment.author}
+                  small(class='text-muted') By #{comment.author.name}
