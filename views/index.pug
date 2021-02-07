@@ -18,7 +18,10 @@ block content
     if comments
       for comment in comments
         div(class='col-sm-6 col-lg-4 mb-4')
-          div(class='card')
+          div(class='card position-relative')
+            if user && user.rank === 2
+              form(action=`/delete/${comment.id}`, method='POST') 
+                button(class='btn-close position-absolute top-0 start-100 translate-middle' type='submit')
             div(class='card-body')
               p(class='card-text')= comment.content
               div(class='card-text d-flex justify-content-between')

@@ -13,10 +13,20 @@ function checkAuthentication(req, res, next) {
   res.redirect('/log-in');
 }
 
+function checkRank(rank) {
+  return function (req, res, next) {
+    if (req.user.rank >= rank) {
+      return next();
+    }
+    res.redirect('/');
+  };
+}
+
 /* GET home page. */
 router.get('/', function (req, res, next) {
   Comment.find()
     .populate('author')
+    .sort({ date: 'asc' })
     .exec(function (err, results) {
       if (err) {
         next(err);
@@ -30,6 +40,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', [
+  checkAuthentication,
   body('comment')
     .trim()
     .escape()
@@ -41,6 +52,7 @@ router.post('/', [
     if (!errors.isEmpty()) {
       Comment.find()
         .populate('author')
+        .sort({ date: 'asc' })
         .exec(function (err, results) {
           if (err) {
             next(err);
@@ -201,5 +213,19 @@ router.post('/member', [
     );
   },
 ]);
+
+router.post(
+  '/delete/:id',
+  checkAuthentication,
+  checkRank(2),
+  (req, res, next) => {
+    Comment.findByIdAndDelete(req.params.id, function (err) {
+      if (err) {
+        next(err);
+      }
+      res.redirect('/');
+    });
+  },
+);
 
 module.exports = router;
