@@ -8,6 +8,7 @@ const passport = require('passport');
 const dotenv = require('dotenv');
 const helmet = require('helmet');
 const compression = require('compression');
+const MongoStore = require('connect-mongo')(session);
 
 dotenv.config();
 
@@ -15,7 +16,12 @@ const indexRouter = require('./routes/index');
 
 const app = express();
 
-require('./modules/db');
+const db = require('./modules/db');
+
+const sessionStore = new MongoStore({
+  mongooseConnection: db,
+  collection: 'sessions',
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -46,6 +52,7 @@ app.use(
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
+    store: sessionStore,
   }),
 );
 
