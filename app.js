@@ -6,6 +6,8 @@ const logger = require('morgan');
 const session = require('express-session');
 const passport = require('passport');
 const dotenv = require('dotenv');
+const helmet = require('helmet');
+const compression = require('compression');
 
 dotenv.config();
 
@@ -19,6 +21,20 @@ require('./modules/db');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'", 'cdn.jsdelivr.net'],
+        scriptSrc: ["'self'", 'cdn.jsdelivr.net'],
+        styleSrc: ["'self'", 'cdn.jsdelivr.net'],
+        fontSrc: ["'self'", 'cdn.jsdelivr.net'],
+        imgSrc: ["'self' data:", 'cdn.jsdelivr.net'],
+      },
+    },
+  }),
+);
+app.use(compression());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
