@@ -1,11 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const passport = require('passport');
-const bcrypt = require('bcryptjs');
-const { body, validationResult } = require('express-validator');
+const { body } = require('express-validator');
 
 const User = require('../models/user');
-const Comment = require('../models/comment');
 
 const { checkAuthentication, checkRank } = require('../modules/helpers');
 const {
@@ -44,7 +41,7 @@ router.post(
     .isLength({ min: 3 })
     .withMessage('Username must be at least of length 3')
     .isAlphanumeric()
-    .withMessage('Username contains non alphanumeric charaters')
+    .withMessage('Username contains non alphanumeric characters')
     .custom(async (value) => {
       const result = await User.findOne({ name: value });
       if (result) {
@@ -79,10 +76,7 @@ router.post(
   body('passcode')
     .escape()
     .custom((value) => {
-      if (value === process.env.ADMIN_PASSCODE) {
-        return true;
-      }
-      if (value === process.env.MEMBER_PASSCODE) {
+      if (value === process.env.ADMIN_PASSCODE || value === process.env.MEMBER_PASSCODE) {
         return true;
       }
       return false;

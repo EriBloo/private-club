@@ -5,11 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const session = require('express-session');
 const passport = require('passport');
-const bcrypt = require('bcryptjs');
-const LocalStrategy = require('passport-local').Strategy;
 const dotenv = require('dotenv');
-
-const User = require('./models/user');
 
 dotenv.config();
 
@@ -17,14 +13,7 @@ const indexRouter = require('./routes/index');
 
 const app = express();
 
-const mongoose = require('mongoose');
-mongoose.connect(process.env.DB_STRING, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-mongoose.set('useFindAndModify', false);
+require('./modules/db');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -44,42 +33,7 @@ app.use(
   }),
 );
 
-passport.use(
-  new LocalStrategy(
-    {
-      usernameField: 'name',
-    },
-    (name, password, done) => {
-      User.findOne({ name }, (err, user) => {
-        if (err) {
-          return done(err);
-        }
-        if (!user) {
-          return done(null, false, { msg: 'Incorrect username' });
-        }
-        bcrypt.compare(password, user.password, (err, res) => {
-          if (err) {
-            return done(err);
-          }
-          if (res) {
-            return done(null, user);
-          }
-          return done(null, false, { msg: 'Incorrect password' });
-        });
-      });
-    },
-  ),
-);
-
-passport.serializeUser(function (user, done) {
-  done(null, user.id);
-});
-
-passport.deserializeUser(function (id, done) {
-  User.findById(id, function (err, user) {
-    done(err, user);
-  });
-});
+require('./modules/passport');
 
 app.use(passport.initialize());
 app.use(passport.session());
